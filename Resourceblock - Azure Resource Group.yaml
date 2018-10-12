@@ -1,0 +1,168 @@
+name: Azure Resource Group
+description: ''
+hostInterface: ''
+guestInterface: Azure Resource Group Interface
+status: Published
+layer: Virtual Infrastructure
+refCI: cmdb_ci_resource_group
+type: ''
+createdBy: Cory.Forsythe
+icon: images/app.ngbsm/generic.svg
+instanceView: false
+instanceSharing: false
+tlr: false
+operationImplementations:
+- operation: Deprovision
+  resourceInterface: Azure Resource Group Interface
+  operationType: DEPROVISION
+  flowDirection: TopDown
+  outputAttributes: ''
+  operationImplementationParameters: []
+  operationSteps: []
+- operation: Provision
+  resourceInterface: Azure Resource Group Interface
+  operationType: PROVISION
+  flowDirection: BottomsUp
+  outputAttributes: ''
+  operationImplementationParameters:
+  - name: Location
+    resourceInterface: Azure Resource Group Interface
+    operation: Provision
+    mapping: ${parameter.Location}
+    dataSource: Text
+    dataSourceValue: ''
+    resourceBlock: Azure Resource Group
+    type: String
+    uiDataType: ''
+    mandatory: true
+    visibility: true
+    readonly: false
+    order: 1000
+    regex: ''
+    helpText: ''
+    defaultValue: ''
+    regexError: ''
+  - name: ResourceGroupName
+    resourceInterface: Azure Resource Group Interface
+    operation: Provision
+    mapping: ${parameter.ResourceGroupName}
+    dataSource: Text
+    dataSourceValue: ''
+    resourceBlock: Azure Resource Group
+    type: String
+    uiDataType: ''
+    mandatory: true
+    visibility: true
+    readonly: false
+    order: 1000
+    regex: ''
+    helpText: ''
+    defaultValue: ''
+    regexError: ''
+  - name: CreateResourceGroup
+    resourceInterface: Azure Resource Group Interface
+    operation: Provision
+    mapping: ${parameter.CreateResourceGroup}
+    dataSource: Text
+    dataSourceValue: ''
+    resourceBlock: Azure Resource Group
+    type: String
+    uiDataType: ''
+    mandatory: true
+    visibility: true
+    readonly: false
+    order: 1000
+    regex: ''
+    helpText: ''
+    defaultValue: 'true'
+    regexError: ''
+  - name: SubscriptionId
+    resourceInterface: Azure Resource Group Interface
+    operation: Provision
+    mapping: ${parameter.SubscriptionId}
+    dataSource: Text
+    dataSourceValue: ''
+    resourceBlock: Azure Resource Group
+    type: String
+    uiDataType: ''
+    mandatory: true
+    visibility: true
+    readonly: false
+    order: 1000
+    regex: ''
+    helpText: ''
+    defaultValue: $(context.SubscriptionId)
+    regexError: ''
+  operationSteps:
+  - name: Azure Extensions Interface.CreateResourceGroup
+    capiInterface: Azure Extensions Interface
+    capiMethod: CreateResourceGroup
+    capiVersion: '1.0'
+    providerType: ''
+    condition: ''
+    order: '0'
+    ownerType: CAPI
+    provider: azure-compute
+    enabled: true
+    stepParameters:
+    - name: providerAPIParameters
+      value: '{"CreateResourceGroup":true,"ResourceGroupName":"${parameter.ResourceGroupName}","SubscriptionId":"${parameter.SubscriptionId}"}'
+      stepParamMappings: []
+      objectMapping: false
+    - name: Location
+      value: ${parameter.Location}
+      stepParamMappings: []
+      objectMapping: false
+    translators:
+    - Azure_Create_Resource_Group_Response_Processor
+    dependsOn: []
+  - name: Azure Extensions Interface.AssignTagPolicy
+    capiInterface: Azure Extensions Interface
+    capiMethod: AssignTagPolicy
+    capiVersion: '1.0'
+    providerType: ''
+    condition: ''
+    order: '10'
+    ownerType: CAPI
+    provider: azure-compute
+    enabled: true
+    stepParameters:
+    - name: CustomTags
+      value: ${parameter.CustomTags}
+      stepParamMappings: []
+      objectMapping: false
+    - name: providerAPIParameters
+      value: '{"CreateResourceGroup":true,"ResourceGroupName":"${parameter.ResourceGroupName}","SubscriptionId":"${parameter.SubscriptionId}"}'
+      stepParamMappings: []
+      objectMapping: false
+    translators: []
+    dependsOn: []
+associatedScripts:
+- name: Azure_Create_Resource_Group_Response_Processor
+  intent: "function processResponse(response, cloudServiceAccountId, ldc, correlationId,step,\
+    \ requestorContext) {\r\n\tvar cloudModelString = [];\r\n\tvar rgResponse = global.JSON.parse(response);\r\
+    \n\t\r\n\tvar rgInfo = {\r\n\t\t\"cmdb_ci_resource_group\": {\r\n\t\t\t\"validator\"\
+    : \"\",\r\n\t\t\t\"validator_overrides\": {\r\n\t\t\t},\r\n\t\t\t\"identification\"\
+    : {\r\n\t\t\t\t\"cmdb_ci_cloud_service_account\": {\r\n\t\t\t\t\t\"criterion\"\
+    : {\r\n\t\t\t\t\t\t\"object_id\": cloudServiceAccountId\r\n\t\t\t\t\t}\r\n\t\t\
+    \t\t},\r\n\t\t\t\t\"cmdb_ci_logical_datacenter\": {\r\n\t\t\t\t\t\"criterion\"\
+    : {\r\n\t\t\t\t\t\t\"object_id\": ldc\r\n\t\t\t\t\t}\r\n\t\t\t\t},\r\n\t\t\t\t\
+    \"cmdb_ci_resource_group\": {\r\n\t\t\t\t\t\"criterion\": {\r\n\t\t\t\t\t\t\"\
+    object_id\": rgResponse.id\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t},\r\n\t\t\t\"\
+    attributes\": {\r\n\t\t\t\t\"object_id\": rgResponse.id,\r\n\t\t\t\t\"name\" :\
+    \ rgResponse.name,\r\n\t\t\t\t\"state\" : \"available\"\r\n\t\t\t}\r\n\t\t}\r\n\
+    \t};\r\n\tcloudModelString.push(rgInfo);\r\n\treturn global.JSON.stringify(cloudModelString);\r\
+    \n}"
+  type: Response Processor
+  resourceName: Azure Resource Group
+associatedGuestInterfaces:
+- resourceBlock: Azure Resource Group
+  resourceInterface: Azure Resource Group Interface
+  systemDefined: false
+  extendsFrom: ''
+associatedHosts:
+- name: Azure Datacenter
+endpointMappings: []
+bindings: []
+endpointRelations: []
+systemDefined: false
